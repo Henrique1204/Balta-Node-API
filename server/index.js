@@ -31,7 +31,27 @@ router.get('/', (req, res, next) => {
 
 app.use('/', router);
 
+// Gerenciando erros do servidor.
+const onError = (e) => {
+    if (e.syscall !== 'listen') throw e;
+
+    const bind = typeof porta === 'string' ? `Pipe ${porta}` : `Porta ${porta}`;
+
+    switch (e.code) {
+        case 'EACCES':
+            console.error(`${bind} | privilegios requeridos.`);
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            console.error(`${bind} | servidor já está em uso.`);
+            process.exit(1);
+            break;
+        default: throw e;
+    }
+};
+
 // Criando servidor.
 const server = http.createServer(app);
 server.listen(porta);
+server.on('error', onError);
 console.log(`API rodando na porta ${porta}`);
