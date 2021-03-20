@@ -14,7 +14,7 @@ exports.get = async (req, res) => {
 
 exports.getBySlug = async (req, res) => {
     try {
-        const slug = req.params.slug;
+        const { slug } = req.params;
 
         const dados = await Produto.findOne({
             slug,
@@ -41,7 +41,7 @@ exports.getById = async (req, res) => {
 
 exports.getByTag = async (req, res) => {
     try {
-        const tag = req.params.tag;
+        const { tag } = req.params;
 
         const dados = await Produto.findOne({
             tag,
@@ -67,10 +67,24 @@ exports.post = async (req, res) => {
     }
 };
 
-exports.put = (req, res) => {
-    res.status(200).send({ id: req.params.id, body: req.body });
+exports.put = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await Produto.findByIdAndUpdate(id, {
+            $set: {
+                titulo: req.body.titulo,
+                descricao: req.body.descricao,
+                preco: req.body.preco,
+            }
+        });
+
+        return res.status(201).send({ status: 'Sucesso', mensagem: 'Dados atualizados!' });
+    } catch({ message }) {
+        console.log(message);
+        return res.status(500).send({ status: 'Falha', mensagem: 'Erro no servidor.' });
+    }
 };
 
 exports.delete = (req, res) => {
     res.status(200).send({ id: req.params.id });
-};
+};  
