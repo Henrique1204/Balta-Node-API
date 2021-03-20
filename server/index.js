@@ -50,8 +50,16 @@ const onError = (e) => {
     }
 };
 
+// Implementando o debug.
+const onListening = () => {
+    const addr = server.address();
+    const bind = typeof addr === 'string' ? `Pipe ${addr}` : `Porta ${addr.port}`;
+    debug(`Escutando na ${bind}`);
+}
+
 // Criando servidor.
 const server = http.createServer(app);
 server.listen(porta);
 server.on('error', onError);
+server.on('listening', onListening);
 console.log(`API rodando na porta ${porta}`);
