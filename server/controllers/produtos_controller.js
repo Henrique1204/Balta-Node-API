@@ -85,6 +85,14 @@ exports.put = async (req, res) => {
     }
 };
 
-exports.delete = (req, res) => {
-    res.status(200).send({ id: req.params.id });
-};  
+exports.delete = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await Produto.findByIdAndRemove(id);
+
+        return res.status(201).send({ status: 'Sucesso', mensagem: 'Dados removidos!' });
+    } catch({ message }) {
+        console.log(message);
+        return res.status(500).send({ status: 'Falha', mensagem: 'Erro no servidor.' });
+    }
+};
