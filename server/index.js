@@ -2,15 +2,13 @@
 const express = require('express');
 const app = express();
 
-// Criando rotas da aplicação.
-const router = express.Router();
+// Confiruando tipos de entradas.
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
-// Primeira rota.
-router.get('/', (req, res, next) => {
-    res.status(200).send({ titulo: 'Node REST API', versao: '1.0.0' });
-});
-
-app.use('/', router);
+// Rota de teste.
+const rotaTeste = require('./rotas/rotaTeste.js');
+app.use('/', rotaTeste);
 
 const server = require('./serverConfig.js');
 server(app);
