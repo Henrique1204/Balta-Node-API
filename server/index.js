@@ -8,12 +8,15 @@ app.use(express.urlencoded({ extended: false }));
 
 // Banco de dados.
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://127.0.0.1/', {
+
+mongoose.connect('mongodb://127.0.0.1/loja', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
     useCreateIndex: true
 });
+
+const Produto = require('./models/produto.js');
 
 // Rota de teste.
 const rotaTeste = require('./rotas/rotaTeste.js');
