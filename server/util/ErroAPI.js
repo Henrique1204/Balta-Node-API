@@ -12,11 +12,11 @@ class ErroAPI {
     constructor(cod, erro) {
         this.cod = cod || erro?.cod;
         this.mensagem = erro?.mensagem || mensagem[`${cod}`];
-        this.erroSQL = erro?.erroSQL || null;
+        this.erroDB = erro?.erroDB || null;
         this.tipo = 'API';
 
-        if (erro?.erroSQL) {
-            this.resposta = { status: 'Falha', mensagem: this.mensagem, erro: this.erroSQL };
+        if (erro?.erroDB) {
+            this.resposta = { status: 'Falha', mensagem: this.mensagem, erro: this.erroDB };
         } else {
             this.resposta = { status: 'Falha', mensagem: this.mensagem };
         }

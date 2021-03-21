@@ -1,18 +1,19 @@
 const mongoose = require('mongoose');
 const Produto = mongoose.model('Produto');
-const { ErroAPI, isString, isArray } = require('../util/ErroAPI.js');
+const { ErroAPI, isString } = require('../util/ErroAPI.js');
+const produtoRepo = require('../repositorios/produto_repositorie.js');
 
 exports.get = async (req, res) => {
     try {
-        const dados = await Produto.find({ ativo: true }, 'titulo slug preco');
+        const { ok, resposta } = await produtoRepo.get();
 
-        return res.status(200).send(dados);
-    } catch({ message }) {
-        console.log(message);
-        return res.status(502).send({
-            status: 'Falha',
-            mensagem: 'Erro ao buscar no banco de dados.'
-        });
+        if (!ok) throw new ErroAPI(null, resposta);
+
+        return res.status(200).send(resposta);
+    } catch({ tipo, cod, resposta, message }) {
+        if (tipo === 'API') return res.status(cod).send(resposta);
+
+        return res.status(500).send({ status: 'Falha', mensagem: message });
     }
 };
 
@@ -20,21 +21,19 @@ exports.getBySlug = async (req, res) => {
     try {
         const { slug } = req.params;
     
-        // Validando se campos estão preenchidos.
         if (!slug) throw new ErroAPI(400);
 
-        const dados = await Produto.findOne({
-            slug,
-            ativo: true
-        }, 'titulo slug preco descricao tags');
+        const { ok, resposta } = await produtoRepo.getBySlug(slug);
 
-        if (!dados) throw new ErroAPI(404);
+        if (!ok) throw new ErroAPI(null, resposta);
 
-        return res.status(200).send(dados);
+        if (!resposta) throw new ErroAPI(404);
+
+        return res.status(200).send(resposta);
     } catch({ tipo, cod, resposta, message }) {
         if (tipo === 'API') return res.status(cod).send(resposta);
 
-        return res.status(502).send({ status: 'Falha', mensagem: 'Erro no banco de dados.' });
+        return res.status(500).send({ status: 'Falha', mensagem: message });
     }
 };
 
@@ -42,42 +41,39 @@ exports.getById = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Validando se campos estão preenchidos.
         if (!id) throw new ErroAPI(400);
 
-        const dados = await Produto.findById(id);
+        const { ok, resposta } = await produtoRepo.getById(id);
 
-        if (!dados) throw new ErroAPI(404);
+        if (!ok) throw new ErroAPI(null, resposta);
 
-        return res.status(200).send(dados);
+        if (!resposta) throw new ErroAPI(404);
+
+        return res.status(200).send(resposta);
     } catch({ tipo, cod, resposta, message }) {
         if (tipo === 'API') return res.status(cod).send(resposta);
 
-        console.log(message);
-        return res.status(500).send({ status: 'Falha', mensagem: 'Erro no servidor.' });
+        return res.status(500).send({ status: 'Falha', mensagem: message });
     }
 };
 
 exports.getByTag = async (req, res) => {
     try {
-        const { tag } = req.params;
+        const { tags } = req.params;
 
-        // Validando se campos estão preenchidos.
-        if (!tag) throw new ErroAPI(400);
+        if (!tags) throw new ErroAPI(400);
 
-        const dados = await Produto.findOne({
-            tag,
-            ativo: true
-        }, 'titulo slug preco descricao tags');
+        const { ok, resposta } = await produtoRepo.getByTag(tags);
 
-        if (!dados) throw new ErroAPI(404);
+        if (!ok) throw new ErroAPI(null, resposta);
 
-        return res.status(200).send(dados);
+        if (!resposta) throw new ErroAPI(404);
+
+        return res.status(200).send(resposta);
     } catch({ tipo, cod, resposta, message }) {
         if (tipo === 'API') return res.status(cod).send(resposta);
 
-        console.log(message);
-        return res.status(500).send({ status: 'Falha', mensagem: 'Erro no servidor.' });
+        return res.status(500).send({ status: 'Falha', mensagem: message });
     }
 };
 
@@ -85,22 +81,20 @@ exports.post = async (req, res) => {
     try {
         const { titulo, descricao, preco, tags, slug } = req.body;
 
-        // Validando se campos estão preenchidos.
         if (!titulo || !descricao || !preco || !tags || !slug) throw new ErroAPI(400);
 
-        // Validando tipos.
         const validacaoString = !isString(titulo) || !isString(descricao) || !isString(slug);
         if (validacaoString || !Array.isArray(tags) || isNaN(preco)) throw new ErroAPI(406);
 
-        const produto = new Produto(req.body);
-        await produto.save();
+        const { ok, resposta } = await produtoRepo.post(req.body);
 
-        return res.status(201).send({ status: 'Sucesso', mensagem: 'Dados adicionado!' });
+        if (!ok) throw new ErroAPI(null, resposta)
+
+        return res.status(201).send(resposta);
     } catch({ tipo, cod, resposta, message }) {
         if (tipo === 'API') return res.status(cod).send(resposta);
 
-        console.log(message);
-        return res.status(500).send({ status: 'Falha', mensagem: 'Erro no servidor.' });
+        return res.status(500).send({ status: 'Falha', mensagem: message });
     }
 };
 
@@ -109,42 +103,36 @@ exports.put = async (req, res) => {
         const { id } = req.params;
         const { titulo, descricao, preco } = req.body;
 
-        // Validando se campos estão preenchidos.
         if (!titulo || !descricao || !preco || !id) throw new ErroAPI(400);
 
-        // Validando tipos.
         if (!isString(titulo) || !isString(descricao) || isNaN(preco)) throw new ErroAPI(406);
 
-        await Produto.findByIdAndUpdate(id, {
-            $set: {
-                titulo: titulo,
-                descricao: descricao,
-                preco: preco,
-            }
-        });
+        const { ok, resposta } = await produtoRepo.put(id, req.body);
 
-        return res.status(201).send({ status: 'Sucesso', mensagem: 'Dados atualizados!' });
+        if (!ok) throw new ErroAPI(null, resposta);
+
+        return res.status(200).send(resposta);
     } catch({ tipo, cod, resposta, message }) {
         if (tipo === 'API') return res.status(cod).send(resposta);
 
-        console.log(message);
-        return res.status(500).send({ status: 'Falha', mensagem: 'Erro no servidor.' });
+        return res.status(500).send({ status: 'Falha', mensagem: message });
     }
 };
 
 exports.delete = async (req, res) => {
     try {
         const { id } = req.params;
-        await Produto.findByIdAndRemove(id);
 
-        // Validando se campos estão preenchidos.
         if (!id) throw new ErroAPI(400);
 
-        return res.status(201).send({ status: 'Sucesso', mensagem: 'Dados removidos!' });
+        const { ok, resposta } = await produtoRepo.delete(id);
+
+        if (!ok) throw new ErroAPI(null, resposta);
+
+        return res.status(200).send(resposta);
     } catch({ tipo, cod, resposta, message }) {
         if (tipo === 'API') return res.status(cod).send(resposta);
 
-        console.log(message);
-        return res.status(500).send({ status: 'Falha', mensagem: 'Erro no servidor.' });
+        return res.status(500).send({ status: 'Falha', mensagem: message });
     }
 };
