@@ -1,11 +1,9 @@
-const mongoose = require('mongoose');
-const Produto = mongoose.model('Produto');
-const { ErroAPI, isString } = require('../util/ErroAPI.js');
-const produtoRepo = require('../repositorios/produto_repositorie.js');
+const { ErroAPI, validarVazio, validarString } = require('../util/validacoesAPI.js');
+const produto = require('../repositorios/produto_repositorie.js');
 
 exports.get = async (req, res) => {
     try {
-        const { ok, resposta } = await produtoRepo.get();
+        const { ok, resposta } = await produto.get();
 
         if (!ok) throw new ErroAPI(null, resposta);
 
@@ -19,11 +17,9 @@ exports.get = async (req, res) => {
 
 exports.getBySlug = async (req, res) => {
     try {
-        const { slug } = req.params;
-    
-        if (!slug) throw new ErroAPI(400);
+        if (validarVazio(req.params, ['slug'])) throw new ErroAPI(400);
 
-        const { ok, resposta } = await produtoRepo.getBySlug(slug);
+        const { ok, resposta } = await produto.getBySlug(req.params.slug);
 
         if (!ok) throw new ErroAPI(null, resposta);
 
@@ -39,11 +35,9 @@ exports.getBySlug = async (req, res) => {
 
 exports.getById = async (req, res) => {
     try {
-        const { id } = req.params;
+        if (validarVazio(req.params, ['id'])) throw new ErroAPI(400);
 
-        if (!id) throw new ErroAPI(400);
-
-        const { ok, resposta } = await produtoRepo.getById(id);
+        const { ok, resposta } = await produto.getById(req.params.id);
 
         if (!ok) throw new ErroAPI(null, resposta);
 
@@ -59,11 +53,9 @@ exports.getById = async (req, res) => {
 
 exports.getByTag = async (req, res) => {
     try {
-        const { tags } = req.params;
+        if (validarVazio(req.params, ['tags'])) throw new ErroAPI(400);
 
-        if (!tags) throw new ErroAPI(400);
-
-        const { ok, resposta } = await produtoRepo.getByTag(tags);
+        const { ok, resposta } = await produto.getByTag(req.params.tags);
 
         if (!ok) throw new ErroAPI(null, resposta);
 
@@ -78,15 +70,20 @@ exports.getByTag = async (req, res) => {
 };
 
 exports.post = async (req, res) => {
+    const validacoes = {
+        vazio: ['titulo', 'descricao', 'preco', 'tags', 'slug'],
+        string: ['titulo', 'descricao', 'slug']
+    };
+
     try {
-        const { titulo, descricao, preco, tags, slug } = req.body;
+        const { body } = req;
 
-        if (!titulo || !descricao || !preco || !tags || !slug) throw new ErroAPI(400);
+        if (validarVazio(body, validacoes.vazio)) throw new ErroAPI(400);
 
-        const validacaoString = !isString(titulo) || !isString(descricao) || !isString(slug);
-        if (validacaoString || !Array.isArray(tags) || isNaN(preco)) throw new ErroAPI(406);
+        const isString = validarString(body, validacoes.string);
+        if (!isString || isNaN(body.preco) || !Array.isArray(body.tags)) throw new ErroAPI(406);
 
-        const { ok, resposta } = await produtoRepo.post(req.body);
+        const { ok, resposta } = await produto.post(body);
 
         if (!ok) throw new ErroAPI(null, resposta)
 
@@ -99,15 +96,20 @@ exports.post = async (req, res) => {
 };
 
 exports.put = async (req, res) => {
+    const validacoes = {
+        vazio: ['titulo', 'descricao', 'preco', 'id'],
+        string: ['titulo', 'descricao']
+    };
+
     try {
         const { id } = req.params;
-        const { titulo, descricao, preco } = req.body;
+        const { body } = req;
 
-        if (!titulo || !descricao || !preco || !id) throw new ErroAPI(400);
+        if (validarVazio({ ...body, id }, validacoes.vazio)) throw new ErroAPI(400);
 
-        if (!isString(titulo) || !isString(descricao) || isNaN(preco)) throw new ErroAPI(406);
+        if (!validarString(body, validacoes.string) || isNaN(body.preco)) throw new ErroAPI(406);
 
-        const { ok, resposta } = await produtoRepo.put(id, req.body);
+        const { ok, resposta } = await produto.put(id, req.body);
 
         if (!ok) throw new ErroAPI(null, resposta);
 
@@ -121,11 +123,9 @@ exports.put = async (req, res) => {
 
 exports.delete = async (req, res) => {
     try {
-        const { id } = req.params;
+        if (validarVazio(req.params, ['id'])) throw new ErroAPI(400);
 
-        if (!id) throw new ErroAPI(400);
-
-        const { ok, resposta } = await produtoRepo.delete(id);
+        const { ok, resposta } = await produto.delete(req.params.id);
 
         if (!ok) throw new ErroAPI(null, resposta);
 
