@@ -29,6 +29,10 @@ app.use('/', rotaTeste);
 const rotaProdutos = require('./rotas/rotaProdutos.js');
 app.use('/produtos', rotaProdutos);
 
+// Rota de clientes.
+const rotaClientes = require('./rotas/rotaClientes.js');
+app.use('/clientes', rotaClientes);
+
 // Criando servidor.
 const server = require('./serverConfig.js');
 server(app);

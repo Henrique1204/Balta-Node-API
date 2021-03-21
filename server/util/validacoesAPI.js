@@ -83,11 +83,24 @@ const validarNaN = (body, campos) => {
     return naoNumero;
 };
 
+const validarEmail = (body, campos) => {
+    let isEmail = true;
+
+    campos.forEach((campo) => {
+        const regex = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+
+        if (!regex.test(body[campo])) isEmail = false;
+    });
+
+    return isEmail
+};
+
 module.exports = {
     ErroAPI,
     validarVazio,
     validarString,
     validarBoolean,
     validarArray,
-    validarNaN
+    validarNaN,
+    validarEmail
 };
