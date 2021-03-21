@@ -16,7 +16,10 @@ mongoose.connect('mongodb://127.0.0.1/loja', {
     useCreateIndex: true
 });
 
+// Carregando models.
 const Produto = require('./models/produto.js');
+const Cliente = require('./models/cliente.js');
+const Pedido = require('./models/pedido.js');
 
 // Rota de teste.
 const rotaTeste = require('./rotas/rotaTeste.js');
