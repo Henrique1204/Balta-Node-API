@@ -1,5 +1,6 @@
 const { ErroAPI, validarVazio, validarString, validarEmail } = require('../util/validacoesAPI.js');
 const cliente = require('../repositories/cliente_repository.js');
+const md5 = require('md5');
 
 exports.get = async (req, res) => {
     try {
@@ -25,7 +26,10 @@ exports.post = async (req, res) => {
 
         if (!validarString(body, campos) || !validarEmail(body, ['email'])) throw new ErroAPI(406);
 
-        const { ok, resposta } = await cliente.post(body);
+        const { ok, resposta } = await cliente.post({
+            ...body,
+            senha: md5(body.senha + global.SALT_KEY)
+        });
 
         if (!ok) throw new ErroAPI(null, resposta)
 
