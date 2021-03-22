@@ -1,6 +1,7 @@
 // Criando aplicação.
 const express = require('express');
 const app = express();
+const config = require('./config.js');
 
 // Confiruando tipos de entradas.
 app.use(express.json());
@@ -9,7 +10,7 @@ app.use(express.urlencoded({ extended: false }));
 // Banco de dados.
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://127.0.0.1/loja', {
+mongoose.connect(config.connectionString, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
