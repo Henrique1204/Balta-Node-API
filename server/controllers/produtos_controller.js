@@ -1,5 +1,5 @@
 const { ErroAPI, validarVazio, validarString } = require('../util/validacoesAPI.js');
-const produto = require('../repositorios/produto_repositorie.js');
+const produto = require('../repositories/produto_repository.js');
 
 exports.get = async (req, res) => {
     try {

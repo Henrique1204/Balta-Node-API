@@ -1,9 +1,10 @@
-const { ErroAPI, validarVazio, validarString, validarEmail } = require('../util/validacoesAPI.js');
-const cliente = require('../repositories/cliente_repository.js');
+const { Guid } = require('js-guid');
+const { ErroAPI } = require('../util/validacoesAPI.js');
+const pedido = require('../repositories/pedido_repository.js');
 
 exports.get = async (req, res) => {
     try {
-        const { ok, resposta } = await cliente.get();
+        const { ok, resposta } = await pedido.get();
 
         if (!ok) throw new ErroAPI(null, resposta);
 
@@ -16,16 +17,12 @@ exports.get = async (req, res) => {
 };
 
 exports.post = async (req, res) => {
-    const campos = ['nome', 'email', 'senha'];
-
     try {
-        const { body } = req;
-
-        if (validarVazio(body, campos)) throw new ErroAPI(400);
-
-        if (!validarString(body, campos) || !validarEmail(body, ['email'])) throw new ErroAPI(406);
-
-        const { ok, resposta } = await cliente.post(body);
+        const { ok, resposta } = await pedido.post({
+            cliente: req.body.cliente,
+            numero: Guid.newGuid().toString().substring(0, 6),
+            itens: req.body.itens
+        });
 
         if (!ok) throw new ErroAPI(null, resposta)
 
