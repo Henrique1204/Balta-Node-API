@@ -1,6 +1,7 @@
 const { ErroAPI, validarVazio, validarString, validarEmail } = require('../util/validacoesAPI.js');
 const cliente = require('../repositories/cliente_repository.js');
 const md5 = require('md5');
+const servicoEmail = require('../servicos/servico_email.js');
 
 exports.get = async (req, res) => {
     try {
@@ -32,6 +33,12 @@ exports.post = async (req, res) => {
         });
 
         if (!ok) throw new ErroAPI(null, resposta)
+
+        await servicoEmail.send(
+            body.email,
+            'Bem-vindo ao Node Store',
+            global.EMAIL_TMPL.replace('{0}', body.nome)
+        );
 
         return res.status(201).send(resposta);
     } catch({ tipo, cod, resposta, message }) {

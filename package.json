@@ -18,12 +18,15 @@
   },
   "homepage": "https://github.com/Henrique1204/Curso-Node#readme",
   "dependencies": {
+    "@sendgrid/mail": "^7.4.2",
     "debug": "^4.3.1",
     "express": "^4.17.1",
     "http": "0.0.1-security",
+    "i": "^0.3.6",
     "js-guid": "^1.0.0",
     "md5": "^2.3.0",
-    "mongoose": "^5.12.1"
+    "mongoose": "^5.12.1",
+    "npm": "^7.6.3"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
