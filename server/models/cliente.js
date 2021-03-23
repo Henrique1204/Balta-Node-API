@@ -16,7 +16,13 @@ const schemaCliente = new Schema({
     senha: {
         type: String,
         required: true
-    }
+    },
+    regras: [{
+        type: String,
+        required: true,
+        enum: ['user', 'admin'],
+        default: 'user'
+    }]
 });
 
 // Exportação do modelo.

@@ -27,3 +27,24 @@ exports.autorizar = (req, res, next) => {
         return res.status(500).send({ status: 'Falha', mensagem: message });
     }
 };
+
+exports.isAdmin = (req, res, next) => {
+    try {
+        const token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+        if (!token) throw new ErroAPI(401);
+
+        jwt.verify(token, global.SALT_KEY, (erro, decoded) => {
+            if (erro) throw new ErroAPI(403);
+
+            const { _doc } = decoded;
+            if (!_doc.regras.includes('admin')) throw new ErroAPI(403);
+
+            return next();
+        });
+    } catch({ tipo, cod, resposta, message }) {
+        if (tipo === 'API') return res.status(cod).send(resposta);
+
+        return res.status(500).send({ status: 'Falha', mensagem: message });
+    }
+};

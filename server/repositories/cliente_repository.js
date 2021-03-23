@@ -27,7 +27,7 @@ exports.post = (dados) => {
 
 exports.autenticacao = ({ email, senha }) => {
     return tratarDB(async () => {
-        const dados = await Cliente.findOne({ email, senha }, 'nome email');
+        const dados = await Cliente.findOne({ email, senha }, 'nome email regras');
 
         return { ok: true, resposta: dados };
     });
@@ -35,7 +35,7 @@ exports.autenticacao = ({ email, senha }) => {
 
 exports.findById = (id) => {
     return tratarDB(async () => {
-        const dados = await Cliente.findById(id, 'nome email');
+        const dados = await Cliente.findById(id, 'nome email regras');
 
         return { ok: true, resposta: dados };
     });

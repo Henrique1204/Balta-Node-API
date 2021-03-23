@@ -35,11 +35,11 @@ exports.post = async (req, res) => {
 
         if (!ok) throw new ErroAPI(null, resposta)
 
-        await servicoEmail.send(
-            body.email,
-            'Bem-vindo ao Node Store',
-            global.EMAIL_TMPL.replace('{0}', body.nome)
-        );
+        // await servicoEmail.send(
+        //     body.email,
+        //     'Bem-vindo ao Node Store',
+        //     global.EMAIL_TMPL.replace('{0}', body.nome)
+        // );
 
         return res.status(201).send(resposta);
     } catch({ tipo, cod, resposta, message }) {
@@ -65,12 +65,13 @@ exports.autenticacao = async (req, res) => {
         });
 
         if (!ok) throw new ErroAPI(null, resposta);
+        if (!resposta) throw new ErroAPI(404);
 
         const token = await servicoAuth.gerarToken({ ...resposta });
 
         return res.status(201).send({ auth: true, token, dados: resposta });
     } catch({ tipo, cod, resposta, message }) {
-        if (tipo === 'API') return res.status(cod).send(resposta);
+        if (tipo === 'API') return res.status(cod).send({ auth: false, ...resposta });
 
         return res.status(500).send({ status: 'Falha', mensagem: message });
     }

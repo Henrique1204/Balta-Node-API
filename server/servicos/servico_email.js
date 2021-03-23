@@ -6,7 +6,7 @@ exports.send = async (to, subject, body) => {
     try {
         await sendGrid.send({
             to,
-            from: 'pauloh16.pdr@gmail.com',
+            from: '',
             subject,
             html: body
         });
