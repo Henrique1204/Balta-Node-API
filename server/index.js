@@ -4,8 +4,12 @@ const app = express();
 const config = require('./config.js');
 
 // Confiruando tipos de entradas.
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: false }));
+
+// Configurando CORS.
+const cors = require('cors');
+app.use(cors({ origin: true, credentials: true}));
 
 // Banco de dados.
 const mongoose = require('mongoose');
