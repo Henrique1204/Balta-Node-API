@@ -24,6 +24,7 @@
     "http": "0.0.1-security",
     "i": "^0.3.6",
     "js-guid": "^1.0.0",
+    "jsonwebtoken": "^8.5.1",
     "md5": "^2.3.0",
     "mongoose": "^5.12.1",
     "npm": "^7.6.3"

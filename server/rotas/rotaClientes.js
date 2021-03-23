@@ -4,5 +4,6 @@ const controller = require('../controllers/clientes_controller.js');
 
 router.get('/', controller.get);
 router.post('/', controller.post);
+router.post('/autenticacao', controller.autenticacao);
 
 module.exports = router;

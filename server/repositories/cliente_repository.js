@@ -24,3 +24,11 @@ exports.post = (dados) => {
         };
     });
 };
+
+exports.autenticacao = ({ email, senha }) => {
+    return tratarDB(async () => {
+        const dados = await Cliente.findOne({ email, senha }, 'nome email');
+
+        return { ok: true, resposta: dados };
+    });
+};

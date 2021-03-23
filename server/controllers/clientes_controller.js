@@ -2,6 +2,7 @@ const { ErroAPI, validarVazio, validarString, validarEmail } = require('../util/
 const cliente = require('../repositories/cliente_repository.js');
 const md5 = require('md5');
 const servicoEmail = require('../servicos/servico_email.js');
+const servicoAuth = require('../servicos/servico_auth.js');
 
 exports.get = async (req, res) => {
     try {
@@ -41,6 +42,33 @@ exports.post = async (req, res) => {
         );
 
         return res.status(201).send(resposta);
+    } catch({ tipo, cod, resposta, message }) {
+        if (tipo === 'API') return res.status(cod).send(resposta);
+
+        return res.status(500).send({ status: 'Falha', mensagem: message });
+    }
+};
+
+exports.autenticacao = async (req, res) => {
+    const campos = ['email', 'senha'];
+
+    try {
+        const { body } = req;
+
+        if (validarVazio(body, campos)) throw new ErroAPI(400);
+
+        if (!validarString(body, campos) || !validarEmail(body, ['email'])) throw new ErroAPI(406);
+
+        const { ok, resposta } = await cliente.autenticacao({
+            ...body,
+            senha: md5(body.senha + global.SALT_KEY)
+        });
+
+        if (!ok) throw new ErroAPI(null, resposta);
+
+        const token = await servicoAuth.gerarToken({ email: resposta.email, nome: resposta.nome });
+
+        return res.status(201).send({ auth: true, token, dados: resposta });
     } catch({ tipo, cod, resposta, message }) {
         if (tipo === 'API') return res.status(cod).send(resposta);
 
