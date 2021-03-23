@@ -1,6 +1,7 @@
 const { Guid } = require('js-guid');
 const { ErroAPI } = require('../util/validacoesAPI.js');
 const pedido = require('../repositories/pedido_repository.js');
+const servicoAuth = require('../servicos/servico_auth.js');
 
 exports.get = async (req, res) => {
     try {
@@ -18,8 +19,11 @@ exports.get = async (req, res) => {
 
 exports.post = async (req, res) => {
     try {
+        const token = req.body.token || req.query.token || req.headers['x-access-token'];
+        const dados = await servicoAuth.decodificarToken(token);
+
         const { ok, resposta } = await pedido.post({
-            cliente: req.body.cliente,
+            cliente: dados._id,
             numero: Guid.newGuid().toString().substring(0, 6),
             itens: req.body.itens
         });

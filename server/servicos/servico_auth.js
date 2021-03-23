@@ -6,8 +6,8 @@ exports.gerarToken = (dados) => (
 );
 
 exports.decodificarToken = async (token) => {
-    const dados = await jwt.verify(token, global.SALT_KEY);
-    return dados;
+    const { _doc } = await jwt.verify(token, global.SALT_KEY);
+    return _doc;
 };
 
 exports.autorizar = (req, res, next) => {
@@ -16,10 +16,9 @@ exports.autorizar = (req, res, next) => {
 
         if (!token) throw new ErroAPI(401);
 
-        jwt.verify(token, global.SALT_KEY, function(erro, decoded) {
+        jwt.verify(token, global.SALT_KEY, (erro) => {
             if (erro) throw new ErroAPI(403);
 
-            req.userId = decoded.id;
             return next();
         });
     } catch({ tipo, cod, resposta, message }) {

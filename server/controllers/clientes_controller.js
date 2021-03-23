@@ -66,7 +66,7 @@ exports.autenticacao = async (req, res) => {
 
         if (!ok) throw new ErroAPI(null, resposta);
 
-        const token = await servicoAuth.gerarToken({ email: resposta.email, nome: resposta.nome });
+        const token = await servicoAuth.gerarToken({ ...resposta });
 
         return res.status(201).send({ auth: true, token, dados: resposta });
     } catch({ tipo, cod, resposta, message }) {
