@@ -32,3 +32,11 @@ exports.autenticacao = ({ email, senha }) => {
         return { ok: true, resposta: dados };
     });
 };
+
+exports.findById = (id) => {
+    return tratarDB(async () => {
+        const dados = await Cliente.findById(id, 'nome email');
+
+        return { ok: true, resposta: dados };
+    });
+};
